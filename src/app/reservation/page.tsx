@@ -1,3 +1,7 @@
+"use client";
+
+import { ChangeEvent, FormEvent, useState } from "react";
+
 const reservationSteps = [
   {
     title: "Choose a schedule",
@@ -17,7 +21,84 @@ const reservationSteps = [
 const inputClassName =
   "mt-2 w-full rounded-2xl border border-stone-700 bg-stone-950 px-4 py-3 text-sm text-stone-100 outline-none transition placeholder:text-stone-500 focus:border-amber-400";
 
+type ReservationFormValues = {
+  fullName: string;
+  email: string;
+  date: string;
+  time: string;
+  guests: string;
+  notes: string;
+};
+
+type ReservationFormErrors = Partial<
+  Record<keyof ReservationFormValues, string>
+>;
+
+const initialFormValues: ReservationFormValues = {
+  fullName: "",
+  email: "",
+  date: "",
+  time: "",
+  guests: "",
+  notes: "",
+};
+
+const initialFormErrors: ReservationFormErrors = {};
+
+const requiredFieldLabels: Record<
+  Exclude<keyof ReservationFormValues, "notes">,
+  string
+> = {
+  fullName: "Full name",
+  email: "Email",
+  date: "Date",
+  time: "Time",
+  guests: "Number of guests",
+};
+
 export default function ReservationPage() {
+  const [formValues, setFormValues] =
+    useState<ReservationFormValues>(initialFormValues);
+  const [formErrors, setFormErrors] =
+    useState<ReservationFormErrors>(initialFormErrors);
+
+  function handleChange(
+    event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
+  ) {
+    const { name, value } = event.target;
+    const fieldName = name as keyof ReservationFormValues;
+
+    setFormValues((currentValues) => ({
+      ...currentValues,
+      [fieldName]: value,
+    }));
+
+    setFormErrors((currentErrors) => ({
+      ...currentErrors,
+      [fieldName]: undefined,
+    }));
+  }
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const nextErrors: ReservationFormErrors = {};
+
+    for (const [fieldName, label] of Object.entries(requiredFieldLabels)) {
+      const key = fieldName as Exclude<keyof ReservationFormValues, "notes">;
+
+      if (!formValues[key].trim()) {
+        nextErrors[key] = `${label} is required.`;
+      }
+    }
+
+    setFormErrors(nextErrors);
+
+    if (Object.keys(nextErrors).length > 0) {
+      return;
+    }
+  }
+
   return (
     <main className="min-h-screen bg-stone-950 px-6 py-16 text-stone-100">
       <section className="mx-auto w-full max-w-5xl rounded-3xl bg-stone-900 px-8 py-12 shadow-2xl md:px-12 md:py-16">
@@ -40,6 +121,8 @@ export default function ReservationPage() {
         <form
           className="rounded-3xl border border-stone-800 bg-stone-900 p-8"
           aria-labelledby="reservation-form-heading"
+          onSubmit={handleSubmit}
+          noValidate
         >
           <div>
             <h2
@@ -65,8 +148,19 @@ export default function ReservationPage() {
                 placeholder="John Doe"
                 autoComplete="name"
                 required
+                value={formValues.fullName}
+                onChange={handleChange}
+                aria-invalid={Boolean(formErrors.fullName)}
+                aria-describedby={
+                  formErrors.fullName ? "fullName-error" : undefined
+                }
                 className={inputClassName}
               />
+              {formErrors.fullName ? (
+                <p id="fullName-error" className="mt-2 text-sm text-red-400">
+                  {formErrors.fullName}
+                </p>
+              ) : null}
             </label>
 
             <label className="block">
@@ -77,8 +171,17 @@ export default function ReservationPage() {
                 placeholder="john@example.com"
                 autoComplete="email"
                 required
+                value={formValues.email}
+                onChange={handleChange}
+                aria-invalid={Boolean(formErrors.email)}
+                aria-describedby={formErrors.email ? "email-error" : undefined}
                 className={inputClassName}
               />
+              {formErrors.email ? (
+                <p id="email-error" className="mt-2 text-sm text-red-400">
+                  {formErrors.email}
+                </p>
+              ) : null}
             </label>
 
             <label className="block">
@@ -87,26 +190,58 @@ export default function ReservationPage() {
                 type="date"
                 name="date"
                 required
+                value={formValues.date}
+                onChange={handleChange}
+                aria-invalid={Boolean(formErrors.date)}
+                aria-describedby={formErrors.date ? "date-error" : undefined}
                 className={inputClassName}
               />
+              {formErrors.date ? (
+                <p id="date-error" className="mt-2 text-sm text-red-400">
+                  {formErrors.date}
+                </p>
+              ) : null}
             </label>
 
             <label className="block">
               <span className="text-sm font-medium text-stone-200">Time</span>
-              <select name="time" required className={inputClassName}>
+              <select
+                name="time"
+                required
+                value={formValues.time}
+                onChange={handleChange}
+                aria-invalid={Boolean(formErrors.time)}
+                aria-describedby={formErrors.time ? "time-error" : undefined}
+                className={inputClassName}
+              >
                 <option value="">Select a time</option>
                 <option value="09:00">09:00 AM</option>
                 <option value="11:00">11:00 AM</option>
                 <option value="13:00">01:00 PM</option>
                 <option value="15:00">03:00 PM</option>
               </select>
+              {formErrors.time ? (
+                <p id="time-error" className="mt-2 text-sm text-red-400">
+                  {formErrors.time}
+                </p>
+              ) : null}
             </label>
 
             <label className="block sm:col-span-2">
               <span className="text-sm font-medium text-stone-200">
                 Number of guests
               </span>
-              <select name="guests" required className={inputClassName}>
+              <select
+                name="guests"
+                required
+                value={formValues.guests}
+                onChange={handleChange}
+                aria-invalid={Boolean(formErrors.guests)}
+                aria-describedby={
+                  formErrors.guests ? "guests-error" : undefined
+                }
+                className={inputClassName}
+              >
                 <option value="">Select guest count</option>
                 <option value="1">1 guest</option>
                 <option value="2">2 guests</option>
@@ -114,6 +249,11 @@ export default function ReservationPage() {
                 <option value="4">4 guests</option>
                 <option value="5">5+ guests</option>
               </select>
+              {formErrors.guests ? (
+                <p id="guests-error" className="mt-2 text-sm text-red-400">
+                  {formErrors.guests}
+                </p>
+              ) : null}
             </label>
 
             <label className="block sm:col-span-2">
@@ -124,6 +264,8 @@ export default function ReservationPage() {
                 name="notes"
                 rows={4}
                 placeholder="Allergies, seating preferences, or special requests"
+                value={formValues.notes}
+                onChange={handleChange}
                 className={inputClassName}
               />
             </label>
@@ -135,7 +277,7 @@ export default function ReservationPage() {
             </p>
 
             <button
-              type="button"
+              type="submit"
               className="inline-flex items-center justify-center rounded-full bg-amber-500 px-6 py-3 text-sm font-semibold text-stone-950 transition hover:bg-amber-400"
             >
               Request reservation
