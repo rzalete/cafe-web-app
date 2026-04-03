@@ -1,19 +1,5 @@
-import { MenuCategoryCard } from "@/components/menu/menu-category-card";
-
-const categories = [
-  {
-    name: "Signature Coffee",
-    description: "House espresso, manual brew options, and seasonal beans.",
-  },
-  {
-    name: "Fresh Pastries",
-    description: "Daily baked croissants, danishes, and sweet cafe favorites.",
-  },
-  {
-    name: "Brunch Plates",
-    description: "Simple savory dishes designed for a relaxed cafe experience.",
-  },
-];
+import { MenuSection } from "@/components/menu/menu-section";
+import { menuSections } from "@/data/menu-sections";
 
 export default function MenuPage() {
   return (
@@ -28,18 +14,18 @@ export default function MenuPage() {
         </h1>
 
         <p className="mt-4 max-w-2xl text-base leading-7 text-stone-300 sm:text-lg">
-          This page is the starting point for the cafe menu experience. Later,
-          we can evolve it into database-driven categories, featured items, and
-          pricing.
+          This page now models realistic menu sections and sample items, giving
+          us a stronger foundation for future database-driven features.
         </p>
       </section>
 
-      <section className="mx-auto mt-10 grid w-full max-w-5xl gap-6 md:grid-cols-3">
-        {categories.map((category) => (
-          <MenuCategoryCard
-            key={category.name}
-            name={category.name}
-            description={category.description}
+      <section className="mx-auto mt-10 grid w-full max-w-5xl gap-6">
+        {menuSections.map((section) => (
+          <MenuSection
+            key={section.id}
+            name={section.name}
+            description={section.description}
+            items={section.items}
           />
         ))}
       </section>
