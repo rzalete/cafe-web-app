@@ -3,6 +3,7 @@ import Link from "next/link";
 const navigation = [
   { href: "/", label: "Home" },
   { href: "/menu", label: "Menu" },
+  { href: "/reservation", label: "Reservations" },
 ];
 
 export function SiteHeader() {
