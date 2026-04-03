@@ -30,6 +30,10 @@ type ReservationFormValues = {
   notes: string;
 };
 
+type ReservationFormErrors = Partial<
+  Record<keyof ReservationFormValues, string>
+>;
+
 const initialFormValues: ReservationFormValues = {
   fullName: "",
   email: "",
@@ -39,23 +43,60 @@ const initialFormValues: ReservationFormValues = {
   notes: "",
 };
 
+const initialFormErrors: ReservationFormErrors = {};
+
+const requiredFieldLabels: Record<
+  Exclude<keyof ReservationFormValues, "notes">,
+  string
+> = {
+  fullName: "Full name",
+  email: "Email",
+  date: "Date",
+  time: "Time",
+  guests: "Number of guests",
+};
+
 export default function ReservationPage() {
   const [formValues, setFormValues] =
     useState<ReservationFormValues>(initialFormValues);
+  const [formErrors, setFormErrors] =
+    useState<ReservationFormErrors>(initialFormErrors);
 
   function handleChange(
     event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
   ) {
     const { name, value } = event.target;
+    const fieldName = name as keyof ReservationFormValues;
 
     setFormValues((currentValues) => ({
       ...currentValues,
-      [name]: value,
+      [fieldName]: value,
+    }));
+
+    setFormErrors((currentErrors) => ({
+      ...currentErrors,
+      [fieldName]: undefined,
     }));
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    const nextErrors: ReservationFormErrors = {};
+
+    for (const [fieldName, label] of Object.entries(requiredFieldLabels)) {
+      const key = fieldName as Exclude<keyof ReservationFormValues, "notes">;
+
+      if (!formValues[key].trim()) {
+        nextErrors[key] = `${label} is required.`;
+      }
+    }
+
+    setFormErrors(nextErrors);
+
+    if (Object.keys(nextErrors).length > 0) {
+      return;
+    }
   }
 
   return (
@@ -81,6 +122,7 @@ export default function ReservationPage() {
           className="rounded-3xl border border-stone-800 bg-stone-900 p-8"
           aria-labelledby="reservation-form-heading"
           onSubmit={handleSubmit}
+          noValidate
         >
           <div>
             <h2
@@ -108,8 +150,17 @@ export default function ReservationPage() {
                 required
                 value={formValues.fullName}
                 onChange={handleChange}
+                aria-invalid={Boolean(formErrors.fullName)}
+                aria-describedby={
+                  formErrors.fullName ? "fullName-error" : undefined
+                }
                 className={inputClassName}
               />
+              {formErrors.fullName ? (
+                <p id="fullName-error" className="mt-2 text-sm text-red-400">
+                  {formErrors.fullName}
+                </p>
+              ) : null}
             </label>
 
             <label className="block">
@@ -122,8 +173,15 @@ export default function ReservationPage() {
                 required
                 value={formValues.email}
                 onChange={handleChange}
+                aria-invalid={Boolean(formErrors.email)}
+                aria-describedby={formErrors.email ? "email-error" : undefined}
                 className={inputClassName}
               />
+              {formErrors.email ? (
+                <p id="email-error" className="mt-2 text-sm text-red-400">
+                  {formErrors.email}
+                </p>
+              ) : null}
             </label>
 
             <label className="block">
@@ -134,8 +192,15 @@ export default function ReservationPage() {
                 required
                 value={formValues.date}
                 onChange={handleChange}
+                aria-invalid={Boolean(formErrors.date)}
+                aria-describedby={formErrors.date ? "date-error" : undefined}
                 className={inputClassName}
               />
+              {formErrors.date ? (
+                <p id="date-error" className="mt-2 text-sm text-red-400">
+                  {formErrors.date}
+                </p>
+              ) : null}
             </label>
 
             <label className="block">
@@ -145,6 +210,8 @@ export default function ReservationPage() {
                 required
                 value={formValues.time}
                 onChange={handleChange}
+                aria-invalid={Boolean(formErrors.time)}
+                aria-describedby={formErrors.time ? "time-error" : undefined}
                 className={inputClassName}
               >
                 <option value="">Select a time</option>
@@ -153,6 +220,11 @@ export default function ReservationPage() {
                 <option value="13:00">01:00 PM</option>
                 <option value="15:00">03:00 PM</option>
               </select>
+              {formErrors.time ? (
+                <p id="time-error" className="mt-2 text-sm text-red-400">
+                  {formErrors.time}
+                </p>
+              ) : null}
             </label>
 
             <label className="block sm:col-span-2">
@@ -164,6 +236,10 @@ export default function ReservationPage() {
                 required
                 value={formValues.guests}
                 onChange={handleChange}
+                aria-invalid={Boolean(formErrors.guests)}
+                aria-describedby={
+                  formErrors.guests ? "guests-error" : undefined
+                }
                 className={inputClassName}
               >
                 <option value="">Select guest count</option>
@@ -173,6 +249,11 @@ export default function ReservationPage() {
                 <option value="4">4 guests</option>
                 <option value="5">5+ guests</option>
               </select>
+              {formErrors.guests ? (
+                <p id="guests-error" className="mt-2 text-sm text-red-400">
+                  {formErrors.guests}
+                </p>
+              ) : null}
             </label>
 
             <label className="block sm:col-span-2">
