@@ -1,4 +1,5 @@
 import type { MenuItem } from "@/data/menu-sections";
+import { MenuItemRow } from "@/components/menu/menu-item-row";
 
 type MenuSectionProps = {
   name: string;
@@ -20,21 +21,7 @@ export function MenuSection({
 
       <div className="mt-6 space-y-4">
         {items.map((item) => (
-          <div
-            key={item.id}
-            className="flex items-start justify-between gap-4 border-t border-stone-800 pt-4 first:border-t-0 first:pt-0"
-          >
-            <div className="flex-1">
-              <h3 className="font-medium text-stone-100">{item.name}</h3>
-              <p className="mt-2 text-sm leading-6 text-stone-400">
-                {item.description}
-              </p>
-            </div>
-
-            <span className="shrink-0 rounded-full bg-stone-800 px-3 py-1 text-sm font-semibold text-amber-400">
-              {item.price}
-            </span>
-          </div>
+          <MenuItemRow key={item.id} item={item} />
         ))}
       </div>
     </article>
