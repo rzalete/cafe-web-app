@@ -2,8 +2,7 @@ import Link from "next/link";
 
 const navigation = [
   { href: "/", label: "Home" },
-  { href: "/#overview", label: "Overview" },
-  { href: "/#features", label: "Features" },
+  { href: "/menu", label: "Menu" },
 ];
 
 export function SiteHeader() {
