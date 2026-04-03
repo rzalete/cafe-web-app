@@ -1,3 +1,7 @@
+"use client";
+
+import { ChangeEvent, FormEvent, useState } from "react";
+
 const reservationSteps = [
   {
     title: "Choose a schedule",
@@ -17,7 +21,43 @@ const reservationSteps = [
 const inputClassName =
   "mt-2 w-full rounded-2xl border border-stone-700 bg-stone-950 px-4 py-3 text-sm text-stone-100 outline-none transition placeholder:text-stone-500 focus:border-amber-400";
 
+type ReservationFormValues = {
+  fullName: string;
+  email: string;
+  date: string;
+  time: string;
+  guests: string;
+  notes: string;
+};
+
+const initialFormValues: ReservationFormValues = {
+  fullName: "",
+  email: "",
+  date: "",
+  time: "",
+  guests: "",
+  notes: "",
+};
+
 export default function ReservationPage() {
+  const [formValues, setFormValues] =
+    useState<ReservationFormValues>(initialFormValues);
+
+  function handleChange(
+    event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
+  ) {
+    const { name, value } = event.target;
+
+    setFormValues((currentValues) => ({
+      ...currentValues,
+      [name]: value,
+    }));
+  }
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+  }
+
   return (
     <main className="min-h-screen bg-stone-950 px-6 py-16 text-stone-100">
       <section className="mx-auto w-full max-w-5xl rounded-3xl bg-stone-900 px-8 py-12 shadow-2xl md:px-12 md:py-16">
@@ -40,6 +80,7 @@ export default function ReservationPage() {
         <form
           className="rounded-3xl border border-stone-800 bg-stone-900 p-8"
           aria-labelledby="reservation-form-heading"
+          onSubmit={handleSubmit}
         >
           <div>
             <h2
@@ -65,6 +106,8 @@ export default function ReservationPage() {
                 placeholder="John Doe"
                 autoComplete="name"
                 required
+                value={formValues.fullName}
+                onChange={handleChange}
                 className={inputClassName}
               />
             </label>
@@ -77,6 +120,8 @@ export default function ReservationPage() {
                 placeholder="john@example.com"
                 autoComplete="email"
                 required
+                value={formValues.email}
+                onChange={handleChange}
                 className={inputClassName}
               />
             </label>
@@ -87,13 +132,21 @@ export default function ReservationPage() {
                 type="date"
                 name="date"
                 required
+                value={formValues.date}
+                onChange={handleChange}
                 className={inputClassName}
               />
             </label>
 
             <label className="block">
               <span className="text-sm font-medium text-stone-200">Time</span>
-              <select name="time" required className={inputClassName}>
+              <select
+                name="time"
+                required
+                value={formValues.time}
+                onChange={handleChange}
+                className={inputClassName}
+              >
                 <option value="">Select a time</option>
                 <option value="09:00">09:00 AM</option>
                 <option value="11:00">11:00 AM</option>
@@ -106,7 +159,13 @@ export default function ReservationPage() {
               <span className="text-sm font-medium text-stone-200">
                 Number of guests
               </span>
-              <select name="guests" required className={inputClassName}>
+              <select
+                name="guests"
+                required
+                value={formValues.guests}
+                onChange={handleChange}
+                className={inputClassName}
+              >
                 <option value="">Select guest count</option>
                 <option value="1">1 guest</option>
                 <option value="2">2 guests</option>
@@ -124,6 +183,8 @@ export default function ReservationPage() {
                 name="notes"
                 rows={4}
                 placeholder="Allergies, seating preferences, or special requests"
+                value={formValues.notes}
+                onChange={handleChange}
                 className={inputClassName}
               />
             </label>
@@ -135,7 +196,7 @@ export default function ReservationPage() {
             </p>
 
             <button
-              type="button"
+              type="submit"
               className="inline-flex items-center justify-center rounded-full bg-amber-500 px-6 py-3 text-sm font-semibold text-stone-950 transition hover:bg-amber-400"
             >
               Request reservation
