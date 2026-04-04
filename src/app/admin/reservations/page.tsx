@@ -1,4 +1,7 @@
+import { updateReservationStatus } from "@/app/admin/reservations/actions";
 import { prisma } from "@/lib/prisma";
+
+type ReservationStatus = "PENDING" | "CONFIRMED" | "CANCELED";
 
 const reservationDateFormatter = new Intl.DateTimeFormat("en-US", {
   dateStyle: "medium",
@@ -10,7 +13,7 @@ const createdAtFormatter = new Intl.DateTimeFormat("en-US", {
   timeStyle: "short",
 });
 
-function getStatusClassName(status: "PENDING" | "CONFIRMED" | "CANCELED") {
+function getStatusClassName(status: ReservationStatus) {
   switch (status) {
     case "CONFIRMED":
       return "border border-emerald-500/30 bg-emerald-500/10 text-emerald-300";
@@ -19,6 +22,57 @@ function getStatusClassName(status: "PENDING" | "CONFIRMED" | "CANCELED") {
     case "PENDING":
     default:
       return "border border-amber-500/30 bg-amber-500/10 text-amber-300";
+  }
+}
+
+function getStatusActions(status: ReservationStatus) {
+  switch (status) {
+    case "CONFIRMED":
+      return [
+        {
+          label: "Mark as pending",
+          value: "PENDING" as const,
+          className:
+            "border border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20",
+        },
+        {
+          label: "Cancel reservation",
+          value: "CANCELED" as const,
+          className:
+            "border border-red-500/30 bg-red-500/10 text-red-300 hover:bg-red-500/20",
+        },
+      ];
+    case "CANCELED":
+      return [
+        {
+          label: "Mark as pending",
+          value: "PENDING" as const,
+          className:
+            "border border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20",
+        },
+        {
+          label: "Confirm reservation",
+          value: "CONFIRMED" as const,
+          className:
+            "border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20",
+        },
+      ];
+    case "PENDING":
+    default:
+      return [
+        {
+          label: "Confirm reservation",
+          value: "CONFIRMED" as const,
+          className:
+            "border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20",
+        },
+        {
+          label: "Cancel reservation",
+          value: "CANCELED" as const,
+          className:
+            "border border-red-500/30 bg-red-500/10 text-red-300 hover:bg-red-500/20",
+        },
+      ];
   }
 }
 
@@ -73,7 +127,7 @@ export default async function AdminReservationsPage() {
 
                   <span
                     className={`inline-flex w-fit rounded-full px-3 py-1 text-sm font-semibold ${getStatusClassName(
-                      reservation.status
+                      reservation.status,
                     )}`}
                   >
                     {reservation.status}
@@ -84,9 +138,7 @@ export default async function AdminReservationsPage() {
                   <div className="rounded-2xl bg-stone-950/40 p-4">
                     <dt className="text-sm text-stone-400">Reservation time</dt>
                     <dd className="mt-1 font-medium text-stone-100">
-                      {reservationDateFormatter.format(
-                        reservation.reservationAt
-                      )}
+                      {reservationDateFormatter.format(reservation.reservationAt)}
                     </dd>
                   </div>
 
@@ -113,6 +165,29 @@ export default async function AdminReservationsPage() {
                     </p>
                   </div>
                 ) : null}
+
+                <div className="mt-6 flex flex-wrap gap-3 border-t border-stone-800 pt-6">
+                  {getStatusActions(reservation.status).map((action) => (
+                    <form key={action.value} action={updateReservationStatus}>
+                      <input
+                        type="hidden"
+                        name="reservationId"
+                        value={reservation.id}
+                      />
+                      <input
+                        type="hidden"
+                        name="status"
+                        value={action.value}
+                      />
+                      <button
+                        type="submit"
+                        className={`inline-flex rounded-full px-4 py-2 text-sm font-semibold transition ${action.className}`}
+                      >
+                        {action.label}
+                      </button>
+                    </form>
+                  ))}
+                </div>
               </article>
             ))}
           </div>
