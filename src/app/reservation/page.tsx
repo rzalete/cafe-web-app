@@ -61,9 +61,13 @@ export default function ReservationPage() {
     useState<ReservationFormValues>(initialFormValues);
   const [formErrors, setFormErrors] =
     useState<ReservationFormErrors>(initialFormErrors);
+  const [submittedReservation, setSubmittedReservation] =
+    useState<ReservationFormValues | null>(null);
 
   function handleChange(
-    event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
+    event: ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
   ) {
     const { name, value } = event.target;
     const fieldName = name as keyof ReservationFormValues;
@@ -77,6 +81,8 @@ export default function ReservationPage() {
       ...currentErrors,
       [fieldName]: undefined,
     }));
+
+    setSubmittedReservation(null);
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -97,6 +103,9 @@ export default function ReservationPage() {
     if (Object.keys(nextErrors).length > 0) {
       return;
     }
+
+    setSubmittedReservation({ ...formValues });
+    setFormValues(initialFormValues);
   }
 
   return (
@@ -117,173 +126,231 @@ export default function ReservationPage() {
         </p>
       </section>
 
-      <section className="mx-auto mt-10 grid w-full max-w-5xl gap-6 lg:grid-cols-[1.3fr_0.9fr]">
-        <form
-          className="rounded-3xl border border-stone-800 bg-stone-900 p-8"
-          aria-labelledby="reservation-form-heading"
-          onSubmit={handleSubmit}
-          noValidate
-        >
-          <div>
-            <h2
-              id="reservation-form-heading"
-              className="text-2xl font-semibold"
-            >
-              Reservation details
-            </h2>
-            <p className="mt-3 max-w-2xl leading-7 text-stone-300">
-              Capture the key information now. We will wire this form up in the
-              next step.
-            </p>
-          </div>
-
-          <div className="mt-8 grid gap-5 sm:grid-cols-2">
-            <label className="block">
-              <span className="text-sm font-medium text-stone-200">
-                Full name
-              </span>
-              <input
-                type="text"
-                name="fullName"
-                placeholder="John Doe"
-                autoComplete="name"
-                required
-                value={formValues.fullName}
-                onChange={handleChange}
-                aria-invalid={Boolean(formErrors.fullName)}
-                aria-describedby={
-                  formErrors.fullName ? "fullName-error" : undefined
-                }
-                className={inputClassName}
-              />
-              {formErrors.fullName ? (
-                <p id="fullName-error" className="mt-2 text-sm text-red-400">
-                  {formErrors.fullName}
-                </p>
-              ) : null}
-            </label>
-
-            <label className="block">
-              <span className="text-sm font-medium text-stone-200">Email</span>
-              <input
-                type="email"
-                name="email"
-                placeholder="john@example.com"
-                autoComplete="email"
-                required
-                value={formValues.email}
-                onChange={handleChange}
-                aria-invalid={Boolean(formErrors.email)}
-                aria-describedby={formErrors.email ? "email-error" : undefined}
-                className={inputClassName}
-              />
-              {formErrors.email ? (
-                <p id="email-error" className="mt-2 text-sm text-red-400">
-                  {formErrors.email}
-                </p>
-              ) : null}
-            </label>
-
-            <label className="block">
-              <span className="text-sm font-medium text-stone-200">Date</span>
-              <input
-                type="date"
-                name="date"
-                required
-                value={formValues.date}
-                onChange={handleChange}
-                aria-invalid={Boolean(formErrors.date)}
-                aria-describedby={formErrors.date ? "date-error" : undefined}
-                className={inputClassName}
-              />
-              {formErrors.date ? (
-                <p id="date-error" className="mt-2 text-sm text-red-400">
-                  {formErrors.date}
-                </p>
-              ) : null}
-            </label>
-
-            <label className="block">
-              <span className="text-sm font-medium text-stone-200">Time</span>
-              <select
-                name="time"
-                required
-                value={formValues.time}
-                onChange={handleChange}
-                aria-invalid={Boolean(formErrors.time)}
-                aria-describedby={formErrors.time ? "time-error" : undefined}
-                className={inputClassName}
+      <section className="mx-auto mt-10 grid w-full max-w-5xl gap-6 lg:grid-cols-[1.3fr_0.9fr] lg:items-start">
+        <div className="space-y-6">
+          <form
+            className="rounded-3xl border border-stone-800 bg-stone-900 p-8"
+            aria-labelledby="reservation-form-heading"
+            onSubmit={handleSubmit}
+            noValidate
+          >
+            <div>
+              <h2
+                id="reservation-form-heading"
+                className="text-2xl font-semibold"
               >
-                <option value="">Select a time</option>
-                <option value="09:00">09:00 AM</option>
-                <option value="11:00">11:00 AM</option>
-                <option value="13:00">01:00 PM</option>
-                <option value="15:00">03:00 PM</option>
-              </select>
-              {formErrors.time ? (
-                <p id="time-error" className="mt-2 text-sm text-red-400">
-                  {formErrors.time}
-                </p>
-              ) : null}
-            </label>
+                Reservation details
+              </h2>
+              <p className="mt-3 max-w-2xl leading-7 text-stone-300">
+                Capture the key information now. We will wire this form up in the
+                next step.
+              </p>
+            </div>
 
-            <label className="block sm:col-span-2">
-              <span className="text-sm font-medium text-stone-200">
-                Number of guests
-              </span>
-              <select
-                name="guests"
-                required
-                value={formValues.guests}
-                onChange={handleChange}
-                aria-invalid={Boolean(formErrors.guests)}
-                aria-describedby={
-                  formErrors.guests ? "guests-error" : undefined
-                }
-                className={inputClassName}
+            <div className="mt-8 grid gap-5 sm:grid-cols-2">
+              <label className="block">
+                <span className="text-sm font-medium text-stone-200">
+                  Full name
+                </span>
+                <input
+                  type="text"
+                  name="fullName"
+                  placeholder="John Doe"
+                  autoComplete="name"
+                  required
+                  value={formValues.fullName}
+                  onChange={handleChange}
+                  aria-invalid={Boolean(formErrors.fullName)}
+                  aria-describedby={
+                    formErrors.fullName ? "fullName-error" : undefined
+                  }
+                  className={inputClassName}
+                />
+                {formErrors.fullName ? (
+                  <p id="fullName-error" className="mt-2 text-sm text-red-400">
+                    {formErrors.fullName}
+                  </p>
+                ) : null}
+              </label>
+
+              <label className="block">
+                <span className="text-sm font-medium text-stone-200">Email</span>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="john@example.com"
+                  autoComplete="email"
+                  required
+                  value={formValues.email}
+                  onChange={handleChange}
+                  aria-invalid={Boolean(formErrors.email)}
+                  aria-describedby={formErrors.email ? "email-error" : undefined}
+                  className={inputClassName}
+                />
+                {formErrors.email ? (
+                  <p id="email-error" className="mt-2 text-sm text-red-400">
+                    {formErrors.email}
+                  </p>
+                ) : null}
+              </label>
+
+              <label className="block">
+                <span className="text-sm font-medium text-stone-200">Date</span>
+                <input
+                  type="date"
+                  name="date"
+                  required
+                  value={formValues.date}
+                  onChange={handleChange}
+                  aria-invalid={Boolean(formErrors.date)}
+                  aria-describedby={formErrors.date ? "date-error" : undefined}
+                  className={inputClassName}
+                />
+                {formErrors.date ? (
+                  <p id="date-error" className="mt-2 text-sm text-red-400">
+                    {formErrors.date}
+                  </p>
+                ) : null}
+              </label>
+
+              <label className="block">
+                <span className="text-sm font-medium text-stone-200">Time</span>
+                <select
+                  name="time"
+                  required
+                  value={formValues.time}
+                  onChange={handleChange}
+                  aria-invalid={Boolean(formErrors.time)}
+                  aria-describedby={formErrors.time ? "time-error" : undefined}
+                  className={inputClassName}
+                >
+                  <option value="">Select a time</option>
+                  <option value="09:00">09:00 AM</option>
+                  <option value="11:00">11:00 AM</option>
+                  <option value="13:00">01:00 PM</option>
+                  <option value="15:00">03:00 PM</option>
+                </select>
+                {formErrors.time ? (
+                  <p id="time-error" className="mt-2 text-sm text-red-400">
+                    {formErrors.time}
+                  </p>
+                ) : null}
+              </label>
+
+              <label className="block sm:col-span-2">
+                <span className="text-sm font-medium text-stone-200">
+                  Number of guests
+                </span>
+                <select
+                  name="guests"
+                  required
+                  value={formValues.guests}
+                  onChange={handleChange}
+                  aria-invalid={Boolean(formErrors.guests)}
+                  aria-describedby={
+                    formErrors.guests ? "guests-error" : undefined
+                  }
+                  className={inputClassName}
+                >
+                  <option value="">Select guest count</option>
+                  <option value="1">1 guest</option>
+                  <option value="2">2 guests</option>
+                  <option value="3">3 guests</option>
+                  <option value="4">4 guests</option>
+                  <option value="5">5+ guests</option>
+                </select>
+                {formErrors.guests ? (
+                  <p id="guests-error" className="mt-2 text-sm text-red-400">
+                    {formErrors.guests}
+                  </p>
+                ) : null}
+              </label>
+
+              <label className="block sm:col-span-2">
+                <span className="text-sm font-medium text-stone-200">
+                  Special notes
+                </span>
+                <textarea
+                  name="notes"
+                  rows={4}
+                  placeholder="Allergies, seating preferences, or special requests"
+                  value={formValues.notes}
+                  onChange={handleChange}
+                  className={inputClassName}
+                />
+              </label>
+            </div>
+
+            <div className="mt-8 flex flex-col gap-4 border-t border-stone-800 pt-6 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm text-stone-400">
+                Client-side and server-side handling will be added next.
+              </p>
+
+              <button
+                type="submit"
+                className="inline-flex items-center justify-center rounded-full bg-amber-500 px-6 py-3 text-sm font-semibold text-stone-950 transition hover:bg-amber-400"
               >
-                <option value="">Select guest count</option>
-                <option value="1">1 guest</option>
-                <option value="2">2 guests</option>
-                <option value="3">3 guests</option>
-                <option value="4">4 guests</option>
-                <option value="5">5+ guests</option>
-              </select>
-              {formErrors.guests ? (
-                <p id="guests-error" className="mt-2 text-sm text-red-400">
-                  {formErrors.guests}
-                </p>
+                Request reservation
+              </button>
+            </div>
+          </form>
+
+          {submittedReservation ? (
+            <section className="rounded-3xl border border-emerald-500/30 bg-emerald-500/10 p-8">
+              <p className="text-sm font-semibold uppercase tracking-[0.3em] text-emerald-300">
+                Reservation requested
+              </p>
+
+              <h2 className="mt-4 text-2xl font-semibold text-stone-50">
+                Thanks, {submittedReservation.fullName}.
+              </h2>
+
+              <p className="mt-3 max-w-2xl leading-7 text-stone-200">
+                Your reservation request has been captured in the UI flow. Next,
+                we will connect this to real submission handling and persistence.
+              </p>
+
+              <dl className="mt-6 grid gap-4 sm:grid-cols-2">
+                <div className="rounded-2xl bg-stone-950/40 p-4">
+                  <dt className="text-sm text-stone-400">Email</dt>
+                  <dd className="mt-1 font-medium text-stone-100">
+                    {submittedReservation.email}
+                  </dd>
+                </div>
+
+                <div className="rounded-2xl bg-stone-950/40 p-4">
+                  <dt className="text-sm text-stone-400">Date</dt>
+                  <dd className="mt-1 font-medium text-stone-100">
+                    {submittedReservation.date}
+                  </dd>
+                </div>
+
+                <div className="rounded-2xl bg-stone-950/40 p-4">
+                  <dt className="text-sm text-stone-400">Time</dt>
+                  <dd className="mt-1 font-medium text-stone-100">
+                    {submittedReservation.time}
+                  </dd>
+                </div>
+
+                <div className="rounded-2xl bg-stone-950/40 p-4">
+                  <dt className="text-sm text-stone-400">Guests</dt>
+                  <dd className="mt-1 font-medium text-stone-100">
+                    {submittedReservation.guests}
+                  </dd>
+                </div>
+              </dl>
+
+              {submittedReservation.notes ? (
+                <div className="mt-4 rounded-2xl bg-stone-950/40 p-4">
+                  <p className="text-sm text-stone-400">Special notes</p>
+                  <p className="mt-1 leading-7 text-stone-100">
+                    {submittedReservation.notes}
+                  </p>
+                </div>
               ) : null}
-            </label>
-
-            <label className="block sm:col-span-2">
-              <span className="text-sm font-medium text-stone-200">
-                Special notes
-              </span>
-              <textarea
-                name="notes"
-                rows={4}
-                placeholder="Allergies, seating preferences, or special requests"
-                value={formValues.notes}
-                onChange={handleChange}
-                className={inputClassName}
-              />
-            </label>
-          </div>
-
-          <div className="mt-8 flex flex-col gap-4 border-t border-stone-800 pt-6 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm text-stone-400">
-              Client-side and server-side handling will be added next.
-            </p>
-
-            <button
-              type="submit"
-              className="inline-flex items-center justify-center rounded-full bg-amber-500 px-6 py-3 text-sm font-semibold text-stone-950 transition hover:bg-amber-400"
-            >
-              Request reservation
-            </button>
-          </div>
-        </form>
+            </section>
+          ) : null}
+        </div>
 
         <aside className="rounded-3xl border border-stone-800 bg-stone-900 p-8">
           <h2 className="text-2xl font-semibold">Booking flow</h2>
