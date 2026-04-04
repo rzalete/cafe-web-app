@@ -27,13 +27,6 @@ export type CreateReservationState = {
   submittedReservation: SubmittedReservation | null;
 };
 
-export const initialCreateReservationState: CreateReservationState = {
-  status: "idle",
-  message: "",
-  fieldErrors: {},
-  submittedReservation: null,
-};
-
 const reservationSchema = z.object({
   fullName: z.string().trim().min(1, "Full name is required."),
   email: z
