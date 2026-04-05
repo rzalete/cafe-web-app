@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { logoutAdmin } from "@/app/admin/actions";
 import { updateReservationStatus } from "@/app/admin/reservations/actions";
 import {
   getAdminSessionCookieName,
@@ -101,18 +102,31 @@ export default async function AdminReservationsPage() {
   return (
     <main className="min-h-screen bg-stone-950 px-6 py-16 text-stone-100">
       <section className="mx-auto w-full max-w-6xl rounded-3xl bg-stone-900 px-8 py-12 shadow-2xl md:px-12 md:py-16">
-        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-amber-400">
-          Internal View
-        </p>
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-amber-400">
+              Internal View
+            </p>
 
-        <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-          Recent reservation requests
-        </h1>
+            <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
+              Recent reservation requests
+            </h1>
 
-        <p className="mt-4 max-w-3xl text-base leading-7 text-stone-300 sm:text-lg">
-          Signed in as {adminSession.adminEmail}. This page reads reservation
-          records directly from PostgreSQL through Prisma in a Server Component.
-        </p>
+            <p className="mt-4 max-w-3xl text-base leading-7 text-stone-300 sm:text-lg">
+              Signed in as {adminSession.adminEmail}. This page reads reservation
+              records directly from PostgreSQL through Prisma in a Server Component.
+            </p>
+          </div>
+
+          <form action={logoutAdmin}>
+            <button
+              type="submit"
+              className="inline-flex rounded-full border border-stone-700 px-5 py-2.5 text-sm font-semibold text-stone-100 transition hover:border-stone-500 hover:bg-stone-800"
+            >
+              Sign out
+            </button>
+          </form>
+        </div>
       </section>
 
       <section className="mx-auto mt-10 w-full max-w-6xl">
