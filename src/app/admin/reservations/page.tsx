@@ -1,11 +1,6 @@
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { logoutAdmin } from "@/app/admin/actions";
 import { updateReservationStatus } from "@/app/admin/reservations/actions";
-import {
-  getAdminSessionCookieName,
-  verifyAdminSession,
-} from "@/lib/admin-session";
+import { requireAdminSession } from "@/lib/admin-session";
 import { prisma } from "@/lib/prisma";
 
 type ReservationStatus = "PENDING" | "CONFIRMED" | "CANCELED";
@@ -84,13 +79,7 @@ function getStatusActions(status: ReservationStatus) {
 }
 
 export default async function AdminReservationsPage() {
-  const cookieStore = await cookies();
-  const sessionToken = cookieStore.get(getAdminSessionCookieName())?.value;
-  const adminSession = await verifyAdminSession(sessionToken);
-
-  if (!adminSession) {
-    redirect("/admin/login");
-  }
+  const adminSession = await requireAdminSession();
 
   const reservations = await prisma.reservation.findMany({
     orderBy: {
