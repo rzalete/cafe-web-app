@@ -1,6 +1,9 @@
 import { AdminLoginForm } from "@/components/admin/admin-login-form";
+import { redirectIfAdminSessionExists } from "@/lib/admin-session";
 
-export default function AdminLoginPage() {
+export default async function AdminLoginPage() {
+  await redirectIfAdminSessionExists();
+
   return (
     <main className="min-h-screen bg-stone-950 px-6 py-16 text-stone-100">
       <section className="mx-auto w-full max-w-2xl rounded-3xl bg-stone-900 px-8 py-12 shadow-2xl md:px-12 md:py-16">
