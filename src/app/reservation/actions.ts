@@ -1,6 +1,11 @@
 "use server";
 
 import { z } from "zod";
+import {
+  maxGuestCount,
+  minGuestCount,
+  reservationTimeOptions,
+} from "@/lib/reservation-config";
 import { prisma } from "@/lib/prisma";
 
 type ReservationFormField =
@@ -27,9 +32,10 @@ export type CreateReservationState = {
   submittedReservation: SubmittedReservation | null;
 };
 
-const ALLOWED_RESERVATION_TIMES = new Set(["09:00", "11:00", "13:00", "15:00"]);
-const MIN_GUEST_COUNT = 1;
-const MAX_GUEST_COUNT = 6;
+const allowedReservationTimes = new Set<string>(
+  reservationTimeOptions.map((option) => option.value),
+);
+
 
 const reservationSchema = z.object({
   fullName: z.string().trim().min(1, "Full name is required."),
@@ -121,21 +127,24 @@ export async function createReservation(
 
   if (
     !Number.isInteger(guestCount) ||
-    guestCount < MIN_GUEST_COUNT ||
-    guestCount > MAX_GUEST_COUNT
+    guestCount < minGuestCount ||
+    guestCount > maxGuestCount
   ) {
     return buildErrorState(
-      `Reservations are limited to ${MIN_GUEST_COUNT}-${MAX_GUEST_COUNT} guests.`,
+      `Reservations are limited to ${minGuestCount}-${maxGuestCount} guests.`,
       {
-        guests: `Please choose between ${MIN_GUEST_COUNT} and ${MAX_GUEST_COUNT} guests.`,
+        guests: `Please choose between ${minGuestCount} and ${maxGuestCount} guests.`,
       },
     );
   }
 
-  if (!ALLOWED_RESERVATION_TIMES.has(validatedFields.data.time)) {
-    return buildErrorState("Please select one of the available reservation times.", {
-      time: "Please choose one of the available reservation times.",
-    });
+  if (!allowedReservationTimes.has(validatedFields.data.time)) {
+    return buildErrorState(
+      "Please select one of the available reservation times.",
+      {
+        time: "Please choose one of the available reservation times.",
+      },
+    );
   }
 
   const reservationAt = buildReservationDateTime(

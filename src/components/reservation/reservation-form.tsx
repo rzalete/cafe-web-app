@@ -3,6 +3,10 @@
 import { useActionState, useEffect, useRef } from "react";
 import { createReservation } from "@/app/reservation/actions";
 import type { CreateReservationState } from "@/app/reservation/actions";
+import {
+  guestCountOptions,
+  reservationTimeOptions,
+} from "@/lib/reservation-config";
 
 const inputClassName =
   "mt-2 w-full rounded-2xl border border-stone-700 bg-stone-950 px-4 py-3 text-sm text-stone-100 outline-none transition placeholder:text-stone-500 focus:border-amber-400";
@@ -132,10 +136,11 @@ export function ReservationForm() {
               defaultValue=""
             >
               <option value="">Select a time</option>
-              <option value="09:00">09:00 AM</option>
-              <option value="11:00">11:00 AM</option>
-              <option value="13:00">01:00 PM</option>
-              <option value="15:00">03:00 PM</option>
+              {reservationTimeOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
             {state.fieldErrors.time ? (
               <p id="time-error" className="mt-2 text-sm text-red-400">
@@ -159,12 +164,11 @@ export function ReservationForm() {
               defaultValue=""
             >
               <option value="">Select guest count</option>
-              <option value="1">1 guest</option>
-              <option value="2">2 guests</option>
-              <option value="3">3 guests</option>
-              <option value="4">4 guests</option>
-              <option value="5">5 guests</option>
-              <option value="6">6 guests</option>
+              {guestCountOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
             {state.fieldErrors.guests ? (
               <p id="guests-error" className="mt-2 text-sm text-red-400">
