@@ -1,4 +1,10 @@
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { updateReservationStatus } from "@/app/admin/reservations/actions";
+import {
+  getAdminSessionCookieName,
+  verifyAdminSession,
+} from "@/lib/admin-session";
 import { prisma } from "@/lib/prisma";
 
 type ReservationStatus = "PENDING" | "CONFIRMED" | "CANCELED";
@@ -77,6 +83,14 @@ function getStatusActions(status: ReservationStatus) {
 }
 
 export default async function AdminReservationsPage() {
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get(getAdminSessionCookieName())?.value;
+  const adminSession = await verifyAdminSession(sessionToken);
+
+  if (!adminSession) {
+    redirect("/admin/login");
+  }
+
   const reservations = await prisma.reservation.findMany({
     orderBy: {
       createdAt: "desc",
@@ -96,9 +110,8 @@ export default async function AdminReservationsPage() {
         </h1>
 
         <p className="mt-4 max-w-3xl text-base leading-7 text-stone-300 sm:text-lg">
-          This page reads reservation records directly from PostgreSQL through
-          Prisma in a Server Component. We are keeping it out of the public
-          navigation until authentication exists.
+          Signed in as {adminSession.adminEmail}. This page reads reservation
+          records directly from PostgreSQL through Prisma in a Server Component.
         </p>
       </section>
 
