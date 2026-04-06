@@ -1,9 +1,9 @@
 import Link from "next/link";
 
 const navigation = [
-  { href: "/", label: "Home" },
+  { href: "/", label: "Beranda" },
   { href: "/menu", label: "Menu" },
-  { href: "/reservation", label: "Reservations" },
+  { href: "/reservation", label: "Reservasi" },
 ];
 
 export function SiteHeader() {
@@ -14,7 +14,7 @@ export function SiteHeader() {
           href="/"
           className="text-sm font-semibold uppercase tracking-[0.3em] text-amber-400"
         >
-          Cafe Web App
+          Ruang Teduh
         </Link>
 
         <nav aria-label="Primary navigation">
