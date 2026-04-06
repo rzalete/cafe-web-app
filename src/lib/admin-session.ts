@@ -3,6 +3,7 @@ import "server-only";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { SignJWT, jwtVerify } from "jose";
+import { env } from "@/lib/env";
 
 const SESSION_COOKIE_NAME = "cafe-admin-session";
 
@@ -11,13 +12,7 @@ type AdminSessionPayload = {
 };
 
 function getSessionSecret() {
-  const sessionSecret = process.env.SESSION_SECRET;
-
-  if (!sessionSecret) {
-    throw new Error("SESSION_SECRET is not set.");
-  }
-
-  return new TextEncoder().encode(sessionSecret);
+  return new TextEncoder().encode(env.SESSION_SECRET);
 }
 
 export async function createAdminSession(adminEmail: string) {

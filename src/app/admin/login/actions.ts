@@ -7,6 +7,7 @@ import {
   createAdminSession,
   getAdminSessionCookieName,
 } from "@/lib/admin-session";
+import { env } from "@/lib/env";
 
 export type AdminLoginState = {
   status: "idle" | "error";
@@ -24,7 +25,7 @@ const adminLoginSchema = z.object({
 
 export async function loginAdmin(
   _prevState: AdminLoginState,
-  formData: FormData
+  formData: FormData,
 ): Promise<AdminLoginState> {
   const validatedFields = adminLoginSchema.safeParse({
     email: formData.get("email"),
@@ -38,16 +39,9 @@ export async function loginAdmin(
     };
   }
 
-  const adminEmail = process.env.ADMIN_EMAIL;
-  const adminPassword = process.env.ADMIN_PASSWORD;
-
-  if (!adminEmail || !adminPassword) {
-    throw new Error("Admin credentials are not configured.");
-  }
-
   if (
-    validatedFields.data.email !== adminEmail ||
-    validatedFields.data.password !== adminPassword
+    validatedFields.data.email !== env.ADMIN_EMAIL ||
+    validatedFields.data.password !== env.ADMIN_PASSWORD
   ) {
     return {
       status: "error",
@@ -61,7 +55,7 @@ export async function loginAdmin(
   cookieStore.set(getAdminSessionCookieName(), sessionToken, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: env.NODE_ENV === "production",
     path: "/",
     maxAge: 60 * 60 * 24,
   });
